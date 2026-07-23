@@ -22,7 +22,7 @@ npx vercel --prod
 ## 📁 Project Structure
 
 ```
-alex-portfolio/
+ezequel-portfolio/
 ├── app/                    # Next.js App Router
 │   ├── layout.tsx          # Root layout, fonts, metadata
 │   ├── page.tsx            # Home page
