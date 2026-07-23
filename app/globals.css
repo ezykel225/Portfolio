@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #09090B;
+  --surface: #111113;
+  --surface2: #18181B;
+  --border: #27272A;
+  --purple: #7C3AED;
+  --purple-l: #A78BFA;
+  --green: #22C55E;
+  --amber: #FBBF24;
+  --blue: #60A5FA;
+  --text: #FAFAFA;
+  --muted: #71717A;
+  --muted2: #52525B;
+}
+
+html { scroll-behavior: smooth; }
+body { background-color: var(--bg); color: var(--text); }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--purple); }
+::selection { background: rgba(124,58,237,0.3); }
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+@keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.3} }
+@keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+.animate-blink { animation: blink 1.2s step-end infinite; }
+.animate-pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+.animate-marquee { animation: marquee 30s linear infinite; }
