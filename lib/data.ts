@@ -330,7 +330,6 @@ const experienceEntries: ExperienceItem[] = [
     color: 'purple',
     desc: 'Performing 2D and 3D data annotation to support AI/ML model training, ensuring accuracy and consistency across large volumes of data.',
     bullets: [
-      'Performed 2D and 3D data annotation to support AI/ML model training',
       'Maintained quality standards on long-term annotation projects, contributing to real-world AI training datasets',
     ],
     skills: ['Data Annotation', '2D/3D Annotation', 'Quality Assurance', 'Remote Work'],
@@ -346,7 +345,6 @@ const experienceEntries: ExperienceItem[] = [
     color: 'blue',
     desc: 'Delivered technical support and troubleshooting for IT-related issues within a corporate environment.',
     bullets: [
-      'Delivered technical support and troubleshooting for IT-related issues within a corporate environment',
       'Built practical experience in diagnosing and resolving hardware and software problems',
     ],
     skills: ['IT Support', 'Technical Troubleshooting', 'Hardware/Software Diagnostics'],
@@ -377,7 +375,6 @@ const experienceEntries: ExperienceItem[] = [
     color: 'blue',
     desc: 'Provided IT support in a fast-paced contact center environment, troubleshooting technical issues for staff and clients.',
     bullets: [
-      'Provided IT support in a fast-paced contact center environment',
       'Gained hands-on experience with IT support workflows and ticketing systems',
     ],
     skills: ['IT Support', 'Technical Troubleshooting'],
@@ -392,7 +389,6 @@ const experienceEntries: ExperienceItem[] = [
     color: 'amber',
     desc: 'Supported a Tier II Vail Resort account, resolving customer inquiries and escalations with a focus on clear communication and problem-solving.',
     bullets: [
-      'Supported a Tier II Vail Resort account, resolving customer inquiries and escalations',
       'Handled high call volumes while maintaining service quality standards',
     ],
     skills: ['Customer Service', 'Communication', 'Problem Solving'],
