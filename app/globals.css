@@ -1,33 +1,122 @@
 @import "tailwindcss";
 
-:root {
-  --bg: #09090B;
-  --surface: #111113;
-  --surface2: #18181B;
-  --border: #27272A;
-  --purple: #7C3AED;
-  --purple-l: #A78BFA;
-  --green: #22C55E;
-  --amber: #FBBF24;
-  --blue: #60A5FA;
-  --text: #FAFAFA;
-  --muted: #71717A;
-  --muted2: #52525B;
+/* ============================================================
+   Design tokens.
+
+   Tailwind v4 does not read tailwind.config.ts — theme values have
+   to be declared here in @theme, which is what generates the
+   utilities (font-syne, text-muted, border-border, …). The short
+   `--bg` / `--purple` aliases below are what the inline `style`
+   props across the components already reference, so they are
+   derived from these tokens rather than restated. One value, one
+   place.
+   ============================================================ */
+@theme {
+  --color-bg:       #09090B;
+  --color-surface:  #111113;
+  --color-surface2: #18181B;
+  --color-border:   #27272A;
+  --color-purple:   #7C3AED;
+  --color-purple-l: #A78BFA;
+  --color-green:    #22C55E;
+  --color-amber:    #FBBF24;
+  --color-blue:     #60A5FA;
+  --color-text:     #FAFAFA;
+
+  /* Neutrals sit high enough on the ramp to clear WCAG AA (4.5:1)
+     against both --bg and --surface. The previous #71717A / #52525B
+     measured 4.12:1 and 2.57:1, so body copy and all meta text were
+     failing. */
+  --color-muted:    #8B8B96;  /* 5.90:1 on bg */
+  --color-muted2:   #7E7E8A;  /* 4.96:1 on bg */
+
+  /* next/font exposes the loaded families as --font-*-src on <html>.
+     Aliasing them here (rather than reusing the same variable names)
+     keeps next/font and Tailwind from overwriting each other. */
+  --font-syne: var(--font-syne-src), ui-sans-serif, system-ui, sans-serif;
+  --font-dm:   var(--font-dm-src), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-src), ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-html { scroll-behavior: smooth; }
-body { background-color: var(--bg); color: var(--text); }
+:root {
+  --bg:       var(--color-bg);
+  --surface:  var(--color-surface);
+  --surface2: var(--color-surface2);
+  --border:   var(--color-border);
+  --purple:   var(--color-purple);
+  --purple-l: var(--color-purple-l);
+  --green:    var(--color-green);
+  --amber:    var(--color-amber);
+  --blue:     var(--color-blue);
+  --text:     var(--color-text);
+  --muted:    var(--color-muted);
+  --muted2:   var(--color-muted2);
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Anchor links land below the sticky navbar instead of under it. */
+  scroll-padding-top: 4.5rem;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-dm);
+  /* Nothing on the page is meant to scroll sideways. */
+  overflow-x: hidden;
+}
 
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--purple); }
-::selection { background: rgba(124,58,237,0.3); }
+::selection { background: rgba(124, 58, 237, 0.3); }
 
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-@keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.3} }
-@keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+/* ============================================================
+   Focus
+   ============================================================ */
+/* Several inputs set outline:none for the custom border treatment,
+   so keyboard users need a ring put back deliberately. */
+:focus-visible {
+  outline: 2px solid var(--purple-l);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
 
-.animate-blink { animation: blink 1.2s step-end infinite; }
+/* ============================================================
+   Shared surfaces
+   ============================================================ */
+.panel {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+}
+
+/* ============================================================
+   Animation
+   ============================================================ */
+@keyframes blink     { 0%,100% { opacity: 1 } 50% { opacity: 0 } }
+@keyframes pulse-dot { 0%,100% { opacity: 1 } 50% { opacity: 0.3 } }
+
+.animate-blink     { animation: blink 1.2s step-end infinite; }
 .animate-pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
-.animate-marquee { animation: marquee 30s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  /* The cursor and the "open to work" dot are decorative loops —
+     hold them at their visible state rather than animating. */
+  .animate-blink,
+  .animate-pulse-dot {
+    animation: none;
+    opacity: 1;
+  }
+
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

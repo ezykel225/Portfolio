@@ -1,23 +1,67 @@
 import { personal } from '@/lib/data'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 
+/**
+ * Names and organisations in the bio are emphasised so the paragraphs
+ * stay scannable. This replaces a dangerouslySetInnerHTML + regex
+ * approach — same result, but the content is never parsed as HTML.
+ */
+const EMPHASISED = [
+  'Ezequel',
+  'Asian College of Science and Technology',
+  'Dumaguete, Central Visayas, Philippines',
+  'barangay e-processing system',
+  'React Native fitness app',
+  'ECE Contact Centers',
+  'Inspiro/Infocom',
+  'Remotasks PH',
+  'Outlier AI',
+  'Qualfon Dumaguete',
+]
+
+function emphasise(text: string) {
+  const pattern = new RegExp(`(${EMPHASISED.map((t) => t.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')).join('|')})`, 'g')
+  return text.split(pattern).map((part, i) =>
+    EMPHASISED.includes(part) ? (
+      <strong key={i} className="font-medium text-[var(--text)]">
+        {part}
+      </strong>
+    ) : (
+      part
+    ),
+  )
+}
+
 export function About() {
   return (
-    <section id="about" className="grid grid-cols-1 md:grid-cols-2 border-b" style={{ borderColor: 'var(--border)' }}>
-      <div className="px-7 py-7 border-b md:border-b-0 md:border-r" style={{ borderColor: 'var(--border)' }}>
-        <SectionLabel>about_me</SectionLabel>
-        {personal.bio.map((para, i) => (
-          <p key={i} className="text-[13px] leading-[1.8] mb-3 last:mb-0" style={{ color: 'var(--muted)' }}
-             dangerouslySetInnerHTML={{ __html: para.replace(/Ezequel|Dumaguete, Central Visayas, Philippines|Asian College of Science and Technology|ECE Contact Centers|Inspiro\/Infocom|Remotasks PH|Outlier AI|Qualfon Dumaguete/g, (m) => `<strong style="color:var(--text);font-weight:500">${m}</strong>`) }}
-          />
+    <section
+      id="about"
+      aria-labelledby="about-heading"
+      className="grid grid-cols-1 border-b border-[var(--border)] md:grid-cols-2"
+    >
+      <div className="border-b border-[var(--border)] px-5 py-9 sm:px-7 md:border-r md:border-b-0">
+        <SectionLabel as="h2" id="about-heading" index="01">
+          about_me
+        </SectionLabel>
+        {personal.bio.map((para) => (
+          <p key={para.slice(0, 32)} className="mb-3.5 text-[13px] leading-[1.85] text-[var(--muted)] last:mb-0">
+            {emphasise(para)}
+          </p>
         ))}
       </div>
-      <div className="px-7 py-7">
-        <SectionLabel>what_i_love</SectionLabel>
-        <ul className="flex flex-col gap-2.5">
-          {personal.loves.map((item, i) => (
-            <li key={i} className="flex gap-2.5 text-[12px] leading-relaxed" style={{ color: 'var(--muted)' }}>
-              <span style={{ color: 'var(--purple-l)', fontSize: 10, marginTop: 3 }}>▸</span>
+
+      <div className="px-5 py-9 sm:px-7">
+        {/* Companion panel to about_me — a heading for structure, but no
+            index, so the numbered spine follows the sections themselves. */}
+        <SectionLabel as="h2" id="loves-heading">
+          what_i_love
+        </SectionLabel>
+        <ul aria-labelledby="loves-heading" className="flex flex-col gap-3">
+          {personal.loves.map((item) => (
+            <li key={item} className="flex gap-2.5 text-[12.5px] leading-relaxed text-[var(--muted)]">
+              <span aria-hidden="true" className="mt-[3px] text-[10px] text-[var(--purple-l)]">
+                ▸
+              </span>
               {item}
             </li>
           ))}

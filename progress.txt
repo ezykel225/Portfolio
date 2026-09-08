@@ -1,0 +1,303 @@
+================================================================
+PORTFOLIO POLISH — PROGRESS LOG
+Branch: claude/portfolio-junior-dev-polish-t4rsze
+================================================================
+
+----------------------------------------------------------------
+PHASE 0 — INSPECTION (complete)
+----------------------------------------------------------------
+Stack: Next.js 15.5 (App Router) · React 19 · TypeScript · Tailwind
+CSS v4 · next/font (Syne, DM Sans, Fira Code). Static export, no
+backend. Content centralised in lib/data.ts. ~1,089 LOC total.
+
+Sections: Navbar · Hero · About · TechStack · Projects · Experience
+· GitHub · Contact · Footer. UI primitives: Button, SectionLabel,
+SkillChip, TimelineItem.
+
+WHAT ALREADY WORKS (preserve):
+  - lib/data.ts as a real single source of truth for content.
+  - Dark terminal aesthetic: `//` comment labels, `~/path` nav,
+    `❯` prompt, macOS traffic-light terminal block. This is the
+    portfolio's identity — kept and strengthened, not replaced.
+  - Project screenshot + clickable thumbnail strip. 12 real
+    screenshots in public/projects/. Kept and reused.
+  - Google Forms contact integration (no-cors POST). Kept.
+  - Live GitHub contribution graph via ghchart.rshah.org. Kept.
+  - Bordered full-bleed grid layout w/ md: 2-column splits. Kept.
+
+WHAT IS WEAK / BROKEN (verified, not assumed):
+  B1. Tailwind v4 does NOT auto-load tailwind.config.ts (needs
+      @theme or @config). Verified against the built CSS bundle:
+      `.font-syne` and `.font-dm` are NEVER GENERATED. Every
+      heading and all body copy silently fell back to the browser
+      default sans-serif. Syne + DM Sans were downloaded on every
+      page load and never applied. tailwind.config.ts was dead
+      config; bg-bg / text-text / border-border also no-ops.
+  B2. Colour contrast fails WCAG AA (measured):
+      --muted  #71717A -> 4.12:1 on bg (all body copy)
+      --muted2 #52525B -> 2.57:1 on bg (meta text, labels, footer)
+  B3. Experience numbers contradict each other: personal.stats says
+      "6+ years", Experience career_snapshot says "7+ yrs_working",
+      transferable_skills paragraph says "7+ years", and the
+      Remotasks entry hardcodes duration "7+ years". Four hand-typed
+      copies of one fact.
+  B4. personal.stats, personal.title, personal.tagline and
+      personal.availableText are dead data — rendered nowhere.
+  B5. Hero has a no-op useEffect (declares unused `i` and `lines`)
+      and a cursorRef that is never read. Leftover scaffolding.
+  B6. framer-motion, react-intersection-observer and
+      lib/animations.ts are installed/present and 100% unused.
+  B7. Contact: location row is <a href="#" target="_blank"> (opens
+      a blank tab); link labels read "linkedin.com/in/ezequel" and
+      "github.com/ezequel" but the real handle is ezykel225.
+  B8. A11y: form <label>s not associated with inputs (no htmlFor /
+      id); inputs set outline:none with no replacement focus ring;
+      thumbnail buttons have alt="" and no accessible name; no skip
+      link; no mobile navigation (nav links are hidden below md and
+      never shown); heading hierarchy jumps h1 -> h3 and sections
+      have no accessible names; no prefers-reduced-motion support
+      for the blinking cursor / pulsing dot.
+  B9. Hero h1 is a fixed 42px with tracking-[-2px] — not responsive.
+  B10. Projects grid is lg:grid-cols-3 for 2 projects, so cards
+      render narrow and stranded on desktop.
+  B11. Case-study depth is absent. Both projects are substantial
+      (Barangay: 8,455 LOC, 14 Supabase tables, RLS policies;
+      FitPro: 3,355 LOC TS, 5 custom hooks) but the site shows one
+      paragraph each.
+  B12. About uses dangerouslySetInnerHTML + a regex to bold names.
+  B13. metadataBase unset (build warning); metadata title leads with
+      "BSIT Student & IT Support"; package name is "alex-portfolio".
+
+SOURCES USED FOR CASE-STUDY DEPTH (no invention):
+  Cloned the two public repos already linked from the portfolio and
+  read their real source:
+    github.com/ezykel225/barangay-batinguel @ ecd5e9d
+    github.com/ezykel225/fitpro            @ 2663d4b
+  Every technical claim added to the case studies is traceable to
+  that source or its README. No metrics, users, clients or outcomes
+  were invented.
+
+DECISIONS CONFIRMED WITH OWNER (asked, not assumed):
+  D1. Lead label = "Junior Web Developer — seeking first dev role".
+  D2. Years of experience = computed from the Aug 2019 start date in
+      lib/data.ts (single source of truth) and labelled
+      "yrs_remote_work", not "yrs_working", so it can never read as
+      7 years of development experience.
+
+----------------------------------------------------------------
+FEATURE LOG
+----------------------------------------------------------------
+
+F0 — FOUNDATION (Tailwind v4 theme + contrast)        [DONE]
+  Changes:
+    - app/globals.css rewritten: design tokens moved into @theme (the
+      only thing Tailwind v4 reads), so font-syne / font-dm / text-muted /
+      border-border generate for the first time. `--bg`, `--purple` etc.
+      are now derived aliases of those tokens, not a second copy.
+    - next/font variables renamed to --font-*-src, so next/font and
+      Tailwind no longer both define --font-syne on <html> (source order
+      decided the winner, which is not something to leave to chance).
+    - --muted #71717A -> #8B8B96, --muted2 #52525B -> #7E7E8A.
+    - Deleted tailwind.config.ts (dead under v4).
+    - Added :focus-visible ring, .panel utility, prefers-reduced-motion.
+  Tests:
+    - Grepped the built CSS bundle before and after: `.font-syne` and
+      `.font-dm` went from absent to present; body picked up DM Sans.
+    - Contrast computed in Node against #09090B and #111113:
+      4.12 -> 5.90 (body), 2.57 -> 4.96 (meta). Both clear AA.
+    - next build.
+  Result: PASS. This was the single largest visual defect — the two
+  brand fonts had never rendered.
+
+F1 — DEVELOPER POSITIONING                            [DONE]
+  Changes:
+    - Hero: role line "Junior Web Developer / Seeking my first developer
+      role / 4th year BSIT student · graduating 2027" directly under the
+      h1, then a concrete summary of what I build.
+    - Terminal rewritten: whoami / cat goal.txt / ls ~/shipped.
+    - CTA ladder: View projects (primary) > Contact me (secondary) >
+      Résumé > GitHub.
+    - h1 now clamp(2rem, 7vw, 3.25rem) instead of a fixed 42px.
+    - Removed the no-op useEffect and unused cursorRef.
+    - Metadata title/description/keywords lead with the developer identity.
+  Tests: rendered at 1440 / 834 / 390 and read back; heading is h1;
+    all four CTAs resolve (#projects, #contact, /resume.pdf 200,
+    github.com/ezykel225).
+  Result: PASS.
+
+F2 — PROJECT SHOWCASE                                 [DONE]
+  Changes:
+    - Grid md:grid-cols-2 (was lg:grid-cols-3 holding two cards, which
+      left a dead third column on desktop).
+    - Cards gained: type badge over the screenshot, subtitle, three
+      highlight proof points, and actions pinned to the bottom so cards
+      of unequal height still line up.
+    - Screenshot + thumbnail strip preserved; thumbnails now have
+      aria-label, aria-current and a focus ring.
+    - Filters: all / web / mobile / full-stack, with aria-pressed.
+  Tests (Chromium):
+    - Each filter clicked: all -> both, web -> Barangay, mobile ->
+      FitPro, full-stack -> Barangay. aria-pressed tracks correctly.
+    - All 26 <img> reported complete && naturalWidth > 0 (the only
+      failure is the third-party ghchart image, blocked in the sandbox).
+    - Every project link enumerated and checked.
+    - 390 / 834 / 1440: no horizontal overflow.
+  Result: PASS.
+
+F3 — PROJECT CASE-STUDY DEPTH                         [DONE]
+  Changes:
+    - components/ui/Modal.tsx — native <dialog> + showModal(), so focus
+      trapping, Esc and page inertness come from the platform.
+    - components/sections/ProjectCaseStudy.tsx — gallery, scope figures,
+      problem, solution, grouped features, how_it_was_built, my_role,
+      technologies, live + source links.
+    - lib/types.ts gained a CaseStudy type; lib/data.ts carries the
+      content for both projects.
+  Sourcing: both public repos were cloned and read. Barangay covers the
+    double-enforced RLS, the two privilege-escalation holes found and
+    closed, the duplicated-getSession auth deadlock, the booking-slot
+    re-check, signed URLs for uploaded IDs, and SQL migrations. FitPro
+    covers the five hooks, the typed AsyncStorage seam, Mifflin-St Jeor
+    targets, per-day idempotent streaks, event-driven badges and strict
+    mode. No metric, outcome or user number was invented.
+  Tests: dialog opens for both projects, correct accessible name, focus
+    moves inside, Esc closes, focus returns to the trigger, close button
+    works, no overflow at 390.
+  Result: PASS. One bug found and fixed here: the <dialog> UA stylesheet
+    sets color: CanvasText, so every uncoloured heading inside rendered
+    black on the dark panel. Caught by looking at a screenshot, not by
+    reading the code. Verified after the fix by reading back the computed
+    colour of all 17 headings in the dialog.
+
+F4 — EXPERIENCE STORYTELLING                          [DONE]
+  Changes:
+    - lib/utils.ts gained monthsBetween / yearsSince / formatDuration /
+      formatMonth / formatRange.
+    - Experience entries store `start` / `end` as 'YYYY-MM'. Date ranges,
+      duration badges, the career-snapshot years and the prose all derive
+      from them. The two internships keep an explicit durationNote
+      because they were measured in hours, not months.
+    - careerSnapshot is computed: yrs_remote_work, roles_held (from the
+      array), apps_shipped (from projects.length), graduating.
+    - The years stat is labelled yrs_remote_work, not yrs_working, so it
+      cannot be read as years of development experience.
+    - Timeline ordered from the data: current roles first, then by most
+      recent end date.
+    - Replaced the generic "transferable skills" paragraph with four
+      themes, each naming the role that evidences it.
+    - Removed four bullets that restated their own role summary almost
+      word for word.
+  Data-consistency check: the old "6+ years" (personal.stats),
+    "7+ yrs_working" (snapshot), "7+ years" (prose) and "7+ years"
+    (Remotasks entry) were four hand-typed copies of one fact. All now
+    come from one date. Computed output reproduces the previously
+    published ranges exactly — "1 yr 2 mos" for Outlier and "6 mos" for
+    Qualfon both match, which is what validates the inclusive counting.
+  Tests: rendered and read back every date, duration and stat.
+  Result: PASS.
+
+F5 — VISUAL IDENTITY                                  [DONE]
+  Changes: the terminal, `//` labels, `~/path` nav and bordered grid are
+    all kept. On top of that: the brand fonts now actually render (F0),
+    a responsive type scale, a consistent section rhythm (px-5 py-9 /
+    sm:px-7), quiet 01-06 index numbers giving the sections a spine, and
+    a .panel utility replacing a repeated inline style object. No new
+    animation, gradient or 3D anything; framer-motion was removed rather
+    than used.
+  Tests: 1440 / 834 / 390 full-page renders reviewed; reduced-motion
+    profile confirms animation-name resolves to none and the cursor and
+    dot hold at opacity 1; no horizontal overflow at any width.
+  Result: PASS.
+
+F6 — CONTACT / CONVERSION                             [DONE]
+  Changes:
+    - The location row was <a href="#" target="_blank"> — it opened a
+      blank tab. It is text now.
+    - Link labels said "linkedin.com/in/ezequel" and "github.com/ezequel"
+      while the real handle is ezykel225; labels are derived from the URLs.
+    - Labels bound to inputs with htmlFor/id; autocomplete added; focus
+      ring restored (inputs set outline:none with no replacement).
+    - Status handling collapsed to one state machine, announced through
+      aria-live, with a "Send another message" reset.
+    - Email promoted to a primary button; error state names the address.
+    - Google Forms integration kept as-is.
+  Tests (no real submission — the POST was intercepted at the network
+    layer and fulfilled locally):
+    - All three label/input bindings confirmed.
+    - Empty submit blocked; all three fields reported invalid.
+    - "not-an-email" rejected by validation.
+    - Intercepted POST body carries entry.845350007 with the typed value,
+      so the Google Form field IDs are still wired correctly.
+    - Success state renders, aria-live announces it, reset clears fields.
+    - Simulated network failure renders the error with the mailto
+      fallback.
+  Result: PASS.
+
+F7 — ACCESSIBILITY & RESPONSIVE UX                    [DONE]
+  Changes: skip link; mobile navigation (the nav links were hidden below
+    md with no way to open them); section labels promoted to the page's
+    h2s so every section has an accessible name; TimelineItem h4 -> h3 to
+    close a skipped level; decorative glyphs aria-hidden; icons carry
+    aria-hidden + focusable="false"; "opens in a new tab" on external
+    links; footer and tablet nav targets padded; alt text describes which
+    screenshot of how many.
+  Tests:
+    - Tab order from a fresh load: skip link is the first stop; all 12
+      first stops report a 2px outline.
+    - Every visible focusable element focused in turn — none lacked a
+      focus indicator.
+    - ARIA snapshot: h1 -> h2 -> h3 throughout, no skipped levels.
+    - Accessible names verified to exclude the "//" and index
+      decorations (exact-name match on all six section headings).
+    - Touch targets at 390 and 834 measured against the WCAG 2.2 AA
+      24x24 minimum: none under, after the footer/nav fix.
+    - Reduced-motion profile verified.
+    - No horizontal overflow at 390 / 834 / 1440.
+  Result: PASS.
+
+F8 — CLEANUP & PRODUCTION READINESS                   [DONE]
+  Changes:
+    - Removed: the Hero no-op effect and unused ref, lib/animations.ts,
+      tailwind.config.ts, the stale public/og-image.txt placeholder, and
+      the framer-motion and react-intersection-observer dependencies
+      (both were installed and entirely unused).
+    - Replaced dangerouslySetInnerHTML + regex in About with a safe
+      highlighter.
+    - Button rewritten to render <a> with href and <button> without,
+      without the unused-variable destructuring the old version needed.
+    - Deduplicated the GitHub SVG into components/ui/icons.tsx.
+    - Added eslint.config.mjs. eslint and eslint-config-next were both
+      installed but there was no config, so `next lint` only ever dropped
+      into its interactive setup — lint had never run on this project.
+      Switched the script to `eslint .` and fixed the 6 real errors and 9
+      warnings it surfaced on first run.
+    - Added a typecheck script, metadataBase (env-driven), an app icon
+      (the tab was showing a 404 favicon), and renamed the package from
+      "alex-portfolio".
+  Tests actually run:
+    - npm run lint          -> 0 errors, 0 warnings
+    - npx tsc --noEmit      -> clean
+    - npm run build         -> succeeds, no warnings
+    - Chromium at 1440/834/390 -> no console or page errors
+  Result: PASS.
+
+----------------------------------------------------------------
+KNOWN LIMITATIONS / NOT DONE
+----------------------------------------------------------------
+  1. The GitHub contribution graph is a third-party image from
+     ghchart.rshah.org. It could not be loaded in this sandbox (outbound
+     blocked), so it is verified only as far as markup, sizing and alt
+     text. If that service goes down, visitors see the alt text. It has
+     fixed width/height so it cannot shift the layout.
+  2. metadataBase falls back to https://ezequel.dev when neither
+     NEXT_PUBLIC_SITE_URL nor Vercel's production domain is set. The real
+     domain was not determinable from the repo — set the env var or edit
+     the literal once it is settled. Wrong only for OG image absolute
+     URLs, nothing else.
+  3. Durations are computed at build time. The site is statically
+     exported, so a duration will go stale until the next deploy. This is
+     strictly better than four hand-typed copies, but it is not live.
+  4. certifications is an empty array and renders "none yet". Populate it
+     in lib/data.ts when there is something real to add.
+  5. No automated test suite exists in this project and none was added —
+     the verification above was done by driving a real browser.
