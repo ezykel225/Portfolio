@@ -1,11 +1,12 @@
 import { ExperienceItem } from '@/lib/types'
+import { formatDuration, formatRange, monthsBetween } from '@/lib/utils'
 
 const dotColors: Record<string, string> = {
   purple: 'var(--purple)',
-  green:  'var(--green)',
-  amber:  'var(--amber)',
-  blue:   'var(--blue)',
-  gray:   'var(--muted2)',
+  green: 'var(--green)',
+  amber: 'var(--amber)',
+  blue: 'var(--blue)',
+  gray: 'var(--muted2)',
 }
 
 interface TimelineItemProps {
@@ -15,64 +16,83 @@ interface TimelineItemProps {
 
 export function TimelineItem({ item, isLast = false }: TimelineItemProps) {
   const dotColor = dotColors[item.color] || 'var(--muted2)'
+  const isCurrent = item.end === null
+  // Both derived from `start` / `end` — never hand-written.
+  const dateRange = formatRange(item.start, item.end)
+  const duration = item.durationNote ?? formatDuration(monthsBetween(item.start, item.end))
 
   return (
-    <div className="flex gap-4 pb-5">
+    <li className="flex gap-4 pb-5">
       {/* Left: dot + line */}
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center" aria-hidden="true">
         <div
-          className="w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1"
+          className="mt-1 h-2.5 w-2.5 flex-shrink-0 rounded-full"
           style={{ background: dotColor, border: '2px solid var(--bg)' }}
         />
-        {!isLast && (
-          <div className="w-px flex-1 mt-1" style={{ background: 'var(--border)', minHeight: 16 }} />
-        )}
+        {!isLast && <div className="mt-1 w-px flex-1" style={{ background: 'var(--border)', minHeight: 16 }} />}
       </div>
 
       {/* Right: content */}
       <div className="pb-1">
-        <div className="font-syne text-[13px] font-bold leading-tight">{item.role}</div>
-        <div className="text-[12px] mt-0.5" style={{ color: 'var(--purple-l)' }}>{item.company}</div>
-        <div className="flex items-center gap-2 mt-1" style={{ fontFamily: 'var(--font-mono)' }}>
-          <span className="text-[10px]" style={{ color: 'var(--muted2)' }}>{item.date}</span>
-          {item.current ? (
-            <span className="text-[9px] px-1.5 py-0.5 rounded"
-                  style={{ background: 'rgba(34,197,94,.1)', color: 'var(--green)', border: '0.5px solid rgba(34,197,94,.25)' }}>
-              ● current
+        <h3 className="font-syne text-[13.5px] leading-tight font-bold">{item.role}</h3>
+        <div className="mt-0.5 text-[12px] text-[var(--purple-l)]">{item.company}</div>
+
+        <div className="mt-1.5 flex flex-wrap items-center gap-2 font-mono">
+          <span className="text-[10px] text-[var(--muted2)]">{dateRange}</span>
+          {isCurrent ? (
+            <span
+              className="rounded px-1.5 py-0.5 text-[9.5px]"
+              style={{
+                background: 'rgba(34,197,94,.1)',
+                color: 'var(--green)',
+                border: '0.5px solid rgba(34,197,94,.25)',
+              }}
+            >
+              <span aria-hidden="true">● </span>current · {duration}
             </span>
           ) : (
-            <span className="text-[9px] px-1.5 py-0.5 rounded"
-                  style={{ background: 'rgba(113,113,122,.1)', color: 'var(--muted)', border: '0.5px solid rgba(113,113,122,.2)' }}>
-              {item.duration}
+            <span
+              className="rounded px-1.5 py-0.5 text-[9.5px]"
+              style={{
+                background: 'rgba(126,126,138,.12)',
+                color: 'var(--muted)',
+                border: '0.5px solid rgba(126,126,138,.22)',
+              }}
+            >
+              {duration}
             </span>
           )}
+          <span className="text-[10px] text-[var(--muted2)]">{item.location}</span>
         </div>
-        {item.desc && (
-          <p className="text-[11.5px] mt-2 leading-relaxed" style={{ color: 'var(--muted)' }}>
-            {item.desc}
-          </p>
-        )}
+
+        {item.desc && <p className="mt-2 text-[12px] leading-relaxed text-[var(--muted)]">{item.desc}</p>}
+
         {item.bullets.length > 0 && (
           <ul className="mt-2 flex flex-col gap-1">
-            {item.bullets.map((b, i) => (
-              <li key={i} className="flex gap-2 text-[11px] leading-relaxed" style={{ color: 'var(--muted)' }}>
-                <span style={{ color: 'var(--purple-l)', fontSize: 9, marginTop: 3 }}>▸</span>
+            {item.bullets.map((b) => (
+              <li key={b} className="flex gap-2 text-[11.5px] leading-relaxed text-[var(--muted)]">
+                <span aria-hidden="true" className="mt-[3px] text-[9px] text-[var(--purple-l)]">
+                  ▸
+                </span>
                 {b}
               </li>
             ))}
           </ul>
         )}
+
         {item.skills.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-2.5">
+          <ul className="mt-2.5 flex flex-wrap gap-1">
             {item.skills.map((s) => (
-              <span key={s} className="text-[9.5px] px-2 py-0.5 rounded"
-                    style={{ background: 'var(--surface2)', border: '0.5px solid var(--border)', color: 'var(--muted)', fontFamily: 'var(--font-mono)' }}>
+              <li
+                key={s}
+                className="rounded border-[0.5px] border-[var(--border)] bg-[var(--surface2)] px-2 py-0.5 font-mono text-[9.5px] text-[var(--muted)]"
+              >
                 {s}
-              </span>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
       </div>
-    </div>
+    </li>
   )
 }

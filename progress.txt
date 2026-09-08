@@ -1,0 +1,98 @@
+================================================================
+PORTFOLIO POLISH — PROGRESS LOG
+Branch: claude/portfolio-junior-dev-polish-t4rsze
+================================================================
+
+----------------------------------------------------------------
+PHASE 0 — INSPECTION (complete)
+----------------------------------------------------------------
+Stack: Next.js 15.5 (App Router) · React 19 · TypeScript · Tailwind
+CSS v4 · next/font (Syne, DM Sans, Fira Code). Static export, no
+backend. Content centralised in lib/data.ts. ~1,089 LOC total.
+
+Sections: Navbar · Hero · About · TechStack · Projects · Experience
+· GitHub · Contact · Footer. UI primitives: Button, SectionLabel,
+SkillChip, TimelineItem.
+
+WHAT ALREADY WORKS (preserve):
+  - lib/data.ts as a real single source of truth for content.
+  - Dark terminal aesthetic: `//` comment labels, `~/path` nav,
+    `❯` prompt, macOS traffic-light terminal block. This is the
+    portfolio's identity — kept and strengthened, not replaced.
+  - Project screenshot + clickable thumbnail strip. 12 real
+    screenshots in public/projects/. Kept and reused.
+  - Google Forms contact integration (no-cors POST). Kept.
+  - Live GitHub contribution graph via ghchart.rshah.org. Kept.
+  - Bordered full-bleed grid layout w/ md: 2-column splits. Kept.
+
+WHAT IS WEAK / BROKEN (verified, not assumed):
+  B1. Tailwind v4 does NOT auto-load tailwind.config.ts (needs
+      @theme or @config). Verified against the built CSS bundle:
+      `.font-syne` and `.font-dm` are NEVER GENERATED. Every
+      heading and all body copy silently fell back to the browser
+      default sans-serif. Syne + DM Sans were downloaded on every
+      page load and never applied. tailwind.config.ts was dead
+      config; bg-bg / text-text / border-border also no-ops.
+  B2. Colour contrast fails WCAG AA (measured):
+      --muted  #71717A -> 4.12:1 on bg (all body copy)
+      --muted2 #52525B -> 2.57:1 on bg (meta text, labels, footer)
+  B3. Experience numbers contradict each other: personal.stats says
+      "6+ years", Experience career_snapshot says "7+ yrs_working",
+      transferable_skills paragraph says "7+ years", and the
+      Remotasks entry hardcodes duration "7+ years". Four hand-typed
+      copies of one fact.
+  B4. personal.stats, personal.title, personal.tagline and
+      personal.availableText are dead data — rendered nowhere.
+  B5. Hero has a no-op useEffect (declares unused `i` and `lines`)
+      and a cursorRef that is never read. Leftover scaffolding.
+  B6. framer-motion, react-intersection-observer and
+      lib/animations.ts are installed/present and 100% unused.
+  B7. Contact: location row is <a href="#" target="_blank"> (opens
+      a blank tab); link labels read "linkedin.com/in/ezequel" and
+      "github.com/ezequel" but the real handle is ezykel225.
+  B8. A11y: form <label>s not associated with inputs (no htmlFor /
+      id); inputs set outline:none with no replacement focus ring;
+      thumbnail buttons have alt="" and no accessible name; no skip
+      link; no mobile navigation (nav links are hidden below md and
+      never shown); heading hierarchy jumps h1 -> h3 and sections
+      have no accessible names; no prefers-reduced-motion support
+      for the blinking cursor / pulsing dot.
+  B9. Hero h1 is a fixed 42px with tracking-[-2px] — not responsive.
+  B10. Projects grid is lg:grid-cols-3 for 2 projects, so cards
+      render narrow and stranded on desktop.
+  B11. Case-study depth is absent. Both projects are substantial
+      (Barangay: 8,455 LOC, 14 Supabase tables, RLS policies;
+      FitPro: 3,355 LOC TS, 5 custom hooks) but the site shows one
+      paragraph each.
+  B12. About uses dangerouslySetInnerHTML + a regex to bold names.
+  B13. metadataBase unset (build warning); metadata title leads with
+      "BSIT Student & IT Support"; package name is "alex-portfolio".
+
+SOURCES USED FOR CASE-STUDY DEPTH (no invention):
+  Cloned the two public repos already linked from the portfolio and
+  read their real source:
+    github.com/ezykel225/barangay-batinguel @ ecd5e9d
+    github.com/ezykel225/fitpro            @ 2663d4b
+  Every technical claim added to the case studies is traceable to
+  that source or its README. No metrics, users, clients or outcomes
+  were invented.
+
+DECISIONS CONFIRMED WITH OWNER (asked, not assumed):
+  D1. Lead label = "Junior Web Developer — seeking first dev role".
+  D2. Years of experience = computed from the Aug 2019 start date in
+      lib/data.ts (single source of truth) and labelled
+      "yrs_remote_work", not "yrs_working", so it can never read as
+      7 years of development experience.
+
+----------------------------------------------------------------
+FEATURE STATUS
+----------------------------------------------------------------
+F0 Foundation (Tailwind v4 theme + contrast)  : PENDING
+F1 Developer positioning                      : PENDING
+F2 Project showcase                           : PENDING
+F3 Project case-study depth                   : PENDING
+F4 Experience storytelling                    : PENDING
+F5 Visual identity                            : PENDING
+F6 Contact / conversion                       : PENDING
+F7 Accessibility & responsive UX              : PENDING
+F8 Cleanup & production readiness             : PENDING
