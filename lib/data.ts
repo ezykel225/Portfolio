@@ -223,12 +223,19 @@ export const projects: Project[] = [
     tags: ['Expo', 'React Native', 'TypeScript', 'Expo Router', 'Leaflet'],
     emoji: '🏋️',
     gradient: 'from-[#0A2010] to-[#166534]',
+    // Splash first — it is what the card shows. The rest follow the
+    // app's own tab order, each detail view after its parent screen.
     images: [
-      '/projects/fitpro-1-run-tracking.webp',
-      '/projects/fitpro-2-nutrition.webp',
-      '/projects/fitpro-3-food-guide.webp',
-      '/projects/fitpro-4-progress.webp',
-      '/projects/fitpro-5-settings.webp',
+      '/projects/fitpro-01-splash.webp',
+      '/projects/fitpro-02-home.webp',
+      '/projects/fitpro-03-workout.webp',
+      '/projects/fitpro-04-workout-swap.webp',
+      '/projects/fitpro-05-run.webp',
+      '/projects/fitpro-06-run-activity.webp',
+      '/projects/fitpro-07-nutrition.webp',
+      '/projects/fitpro-08-food-guide.webp',
+      '/projects/fitpro-09-progress.webp',
+      '/projects/fitpro-10-settings.webp',
     ],
     live: 'https://fit-pro-orpin.vercel.app/onboarding',
     github: 'https://github.com/ezykel225/FitPro.git',
@@ -245,6 +252,15 @@ export const projects: Project[] = [
             'Collects gender, age, height, current and target weight, training frequency and goals',
             'Generates a personalised daily calorie and macro target from those answers',
             'Goals stay editable in Settings, with a button to recompute them from updated stats',
+          ],
+        },
+        {
+          group: 'Home',
+          items: [
+            'Streak, calories logged today and workout completion at a glance',
+            'A snapshot of the day against the calorie target',
+            'Quick actions into a workout, a meal, a walk or run, and the awards screen',
+            'A daily motivational line',
           ],
         },
         {
