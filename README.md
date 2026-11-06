@@ -27,6 +27,31 @@ npm run lint        # eslint
 npm run typecheck   # tsc --noEmit
 ```
 
+## Live viewer counter
+
+The badge row shows `N viewing now · M views`, backed by Upstash Redis.
+
+It is **optional**. Without credentials the API answers 503, the component
+renders nothing and the rest of the site is unaffected — so a local checkout
+needs no setup at all.
+
+To enable it, add Upstash Redis from the Vercel Marketplace; the integration
+injects the variables itself. Either naming works:
+
+```
+KV_REST_API_URL        /  UPSTASH_REDIS_REST_URL
+KV_REST_API_TOKEN      /  UPSTASH_REDIS_REST_TOKEN
+```
+
+How it works: `app/api/presence/route.ts` keeps a Redis sorted set scored by
+each viewer's last ping. Every request prunes entries older than 30 seconds
+and counts what remains, so someone who closes the tab drops off without
+having to announce it. Views increment once per browser tab.
+
+Nothing stored identifies a visitor — the id is a random string the browser
+makes up for the tab and forgets when it closes. No IP, no cookie, no
+fingerprint.
+
 ## Where the content lives
 
 `lib/data.ts` is the single source of truth for every piece of content — personal
