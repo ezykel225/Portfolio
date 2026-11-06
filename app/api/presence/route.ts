@@ -26,8 +26,11 @@ const ID = /^[a-z0-9]{8,40}$/
  * cookie, no fingerprint.
  */
 export async function POST(request: Request) {
+  // Not configured is a valid state, not a failure: the site is meant to
+  // run without a counter. Answering 200 keeps it out of the deployment's
+  // error rate, which should mean "something is broken".
   if (!redis) {
-    return NextResponse.json({ available: false }, { status: 503 })
+    return NextResponse.json({ available: false }, { status: 200 })
   }
 
   let id: unknown
@@ -64,7 +67,8 @@ export async function POST(request: Request) {
       { headers: { 'Cache-Control': 'no-store' } }
     )
   } catch {
-    // A Redis hiccup must never surface on the page.
+    // A configured backend that failed IS worth seeing in the metrics,
+    // so this one stays a 5xx. The page still shows nothing either way.
     return NextResponse.json({ available: false }, { status: 503 })
   }
 }
