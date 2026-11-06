@@ -1,15 +1,11 @@
-# Portfolio B — Workspace
+# Ezequel Bautista — Portfolio
 
-An alternative personal portfolio for **Ezequel Bautista**, built as a compact
-developer workspace rather than a long scrolling page.
+A personal portfolio built as a compact developer workspace rather than a long
+scrolling page.
 
-The whole portfolio — who I am, what I've built, my stack, my experience and how
-to reach me — fits in a single viewport from 1280px up. Navigation opens drawers
+The whole thing — who I am, what I've built, my stack, my experience and how to
+reach me — fits in a single viewport from 1280px up. Navigation opens drawers
 over the board instead of loading pages, so nothing costs a page load.
-
-This is a standalone version of the experiment that first lived at `/v2` in
-[ezykel225/Portfolio2](https://github.com/ezykel225/Portfolio2). The original
-portfolio is a separate project.
 
 ## Stack
 
