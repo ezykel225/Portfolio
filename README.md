@@ -46,10 +46,15 @@ KV_REST_API_TOKEN      /  UPSTASH_REDIS_REST_TOKEN
 How it works: `app/api/presence/route.ts` keeps a Redis sorted set scored by
 each viewer's last ping. Every request prunes entries older than 30 seconds
 and counts what remains, so someone who closes the tab drops off without
-having to announce it. Views increment once per browser tab.
+having to announce it.
 
-Nothing stored identifies a visitor — the id is a random string the browser
-makes up for the tab and forgets when it closes. No IP, no cookie, no
+The ping id lives in `localStorage`, which is shared across a browser's tabs,
+so one person counts once however many tabs they have open. Views are counted
+per page load, which is what a view means.
+
+Nothing stored identifies a visitor: the id is a random string used only to
+collapse one browser's pings into a single entry. It is never logged, and the
+server drops it thirty seconds after the last ping. No IP, no cookie, no
 fingerprint.
 
 ## Where the content lives

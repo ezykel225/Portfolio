@@ -4,21 +4,36 @@ import { cn } from '@/lib/utils'
 
 /** How often a visible tab says "still here". */
 const PING_MS = 12_000
-const SESSION_KEY = 'wk:session'
+const VISITOR_KEY = 'wk:visitor'
 
 type Live = { viewing: number; views: number }
 
-function sessionId(): string {
+const newId = () => Math.random().toString(36).slice(2) + Date.now().toString(36)
+
+/**
+ * The id this browser pings with.
+ *
+ * Deliberately localStorage rather than sessionStorage: sessionStorage is
+ * per-tab, so somebody with three tabs open would have been counted as
+ * three people viewing. localStorage is shared across a browser's tabs,
+ * so one person counts once however many tabs they have open.
+ *
+ * It is a random string, used only to collapse this browser's own pings
+ * into one entry. It is never logged, and the server drops it thirty
+ * seconds after the last ping, so it identifies nobody and persists
+ * nowhere but this browser.
+ */
+function visitorId(): string {
   try {
-    const existing = sessionStorage.getItem(SESSION_KEY)
+    const existing = localStorage.getItem(VISITOR_KEY)
     if (existing) return existing
-    const id = Math.random().toString(36).slice(2) + Date.now().toString(36)
-    sessionStorage.setItem(SESSION_KEY, id)
+    const id = newId()
+    localStorage.setItem(VISITOR_KEY, id)
     return id
   } catch {
     // Private windows and blocked storage: a per-load id still works,
-    // it just counts a reload as a new view.
-    return Math.random().toString(36).slice(2) + Date.now().toString(36)
+    // it just means tabs there are counted separately.
+    return newId()
   }
 }
 
@@ -31,6 +46,9 @@ function sessionId(): string {
 // each would claim to be the tab's first ping, count every visit twice.
 // So the polling lives here, at module scope, and the components are
 // just subscribers.
+//
+// `counted` is per page load, which is what a view means: a reload or a
+// new tab is a new view, while the viewer count stays one per browser.
 // ------------------------------------------------------------
 
 let live: Live | null = null
@@ -44,7 +62,7 @@ async function ping() {
     const response = await fetch('/api/presence', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: sessionId(), first: !counted }),
+      body: JSON.stringify({ id: visitorId(), first: !counted }),
     })
     if (!response.ok) return
     const data = await response.json()
