@@ -213,7 +213,7 @@ export function ProjectSheet({ project, onClose }: ProjectSheetProps) {
       onClose={onClose}
       labelledBy="wk-project-sheet-title"
       title={project.title}
-      eyebrow={`${project.type} · ${project.year}`}
+      eyebrow={`${project.type} · ${project.status} · ${project.year}`}
       widthClass="sm:max-w-2xl"
     >
       <Body key={project.id} project={project} />

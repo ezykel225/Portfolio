@@ -24,6 +24,12 @@ export interface CaseStudy {
 export interface Project {
   id: string
   title: string
+  /**
+   * What kind of work this was and how far it got, e.g.
+   * "Capstone · Deployed demo". Shown on the card so nobody has to
+   * guess whether a project is in production.
+   */
+  status: string
   /** Five-or-so words: what kind of thing this is. */
   subtitle: string
   /** "Web app" / "Mobile app" — rendered as the card's type badge. */
@@ -58,6 +64,11 @@ export interface ExperienceItem {
   start: string
   /** 'YYYY-MM', or null while the role is ongoing. */
   end: string | null
+  /**
+   * One or two outcome-focused lines. Separate from `bullets`, which
+   * describe what the job was; these say what came of it.
+   */
+  results?: string[]
   /**
    * Set only where elapsed time is the wrong unit — the two internships
    * are measured in required hours, not months.

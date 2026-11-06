@@ -3,7 +3,7 @@ import { personal, projects } from '@/lib/data'
 import { GitHubIcon, LinkedInIcon, MailIcon, PinIcon } from '@/components/icons'
 import { DownloadIcon } from './icons'
 import { navItems, type NavTarget } from './NavItems'
-import { Monogram, AvailabilityDot } from './Identity'
+import { Monogram } from './Identity'
 import { LiveCounter } from './LiveCounter'
 import { track } from '@/lib/track'
 import { cn } from '@/lib/utils'
@@ -45,13 +45,6 @@ export function Rail({ active, onSelect, onOpenProject, openProjectId }: RailPro
           <PinIcon className="h-3.5 w-3.5 shrink-0" />
           <span className="truncate">{personal.locationShort}</span>
         </p>
-
-        {personal.available ? (
-          <p className="mt-1.5 flex items-center gap-2 text-[11.5px] text-[var(--green)]">
-            <AvailabilityDot />
-            <span className="truncate">{personal.seeking}</span>
-          </p>
-        ) : null}
 
         {/* Live numbers, ruled off from the identity above them: everything
             else in this card is fixed, this is the only part that moves. */}

@@ -11,6 +11,15 @@
 import type { Project, ExperienceItem, Certification } from './types'
 import { monthsBetween, yearsSince } from './utils'
 
+/**
+ * Marks content that still has to be written.
+ *
+ * Anything set to TODO is filtered out before it renders, so the site
+ * never shows the word itself — a half-written stat simply does not
+ * appear until it is filled in. Search the file for TODO to find them.
+ */
+export const TODO = 'TODO' as const
+
 export const personal = {
   name: 'Ezequel Bautista',
 
@@ -31,13 +40,22 @@ export const personal = {
   available: true,
   availableText: 'Open to junior developer roles, internships, part-time and remote work',
 
+  /** The practical details a recruiter checks before writing to you. */
+  availability: {
+    openTo: ['Full-time', 'Internship', 'Remote'],
+    // TODO(ezequel): the earliest date you could start, e.g. 'June 2027'
+    // or 'Immediately for part-time'. Hidden until this is filled in.
+    from: TODO as string,
+    timezone: 'Asia/Manila · UTC+8',
+  },
+
   // One line under the h1 — what I do, stated concretely.
   summary:
-    'I build full-stack web apps with React, TypeScript and Supabase, and mobile apps with Expo and React Native. Two of them are shipped and running — the code for both is on GitHub.',
+    'I build full-stack web apps with React, TypeScript and Supabase, and mobile apps with Expo and React Native. I have built two — a barangay e-services system and a fitness app — and the code for both is public.',
 
   bio: [
     "I'm Ezequel, a 4th year BSIT student at Asian College of Science and Technology (graduating 2027), based in Dumaguete, Central Visayas, Philippines.",
-    "I learn by building things that have to actually work. My two main projects are a barangay e-processing system — React and Supabase, with role-based dashboards, Row Level Security policies and a booking system — and a React Native fitness app built with Expo. Both are live, and both repositories are public.",
+    "I learn by building things that have to actually work. My two projects are a barangay e-processing system — React and Supabase, with role-based dashboards, Row Level Security policies and a booking system — and a React Native fitness app built with Expo. Both are live, and both repositories are public.",
     "Alongside my studies I've built hands-on IT experience through two internships, as an IT Support Intern at ECE Contact Centers and Inspiro/Infocom. I've also worked remotely as a Data Annotator with Remotasks PH and Outlier AI on AI training projects, and in customer service at Qualfon Dumaguete — work that taught me to be careful, self-managed, and clear with people.",
   ],
 
@@ -49,22 +67,6 @@ export const personal = {
     'Applying what I learn in class to real, working software',
   ],
 
-  // The terminal is the site's signature. It now answers the three
-  // questions a recruiter has in the first five seconds.
-  terminalLines: [
-    {
-      prompt: 'whoami',
-      output: 'ezequel — junior web developer // React · TypeScript · Supabase · React Native',
-    },
-    {
-      prompt: 'cat goal.txt',
-      output: '"Looking for my first developer role. 4th year BSIT, graduating 2027."',
-    },
-    {
-      prompt: 'ls ~/shipped',
-      output: 'barangay-batinguel-e-system/   fitpro/',
-    },
-  ],
 }
 
 export const techStack = [
@@ -76,14 +78,12 @@ export const techStack = [
   },
   {
     category: 'backend & services',
-    items: ['Supabase Auth', 'Postgres', 'Row Level Security', 'Supabase Storage'],
+    items: ['Supabase Auth', 'Postgres', 'Supabase Storage'],
   },
   {
     category: 'tools & libraries',
     items: [
-      'Git',
-      'GitHub',
-      'React Context',
+      'Git & GitHub',
       'AsyncStorage',
       'react-hot-toast',
       'react-native-chart-kit',
@@ -107,10 +107,11 @@ export const projects: Project[] = [
   {
     id: 'barangay-batinguel',
     title: 'Barangay Batinguel E-System',
+    status: 'Capstone · Deployed demo',
     subtitle: 'Local government services, online',
     type: 'Full-stack web app',
     year: '2025 – 2026',
-    desc: 'A web-based e-processing system for Barangay Batinguel, Dumaguete City. Residents book the covered court, request documents and check announcements online; officials and the health-centre nurse manage it all from role-specific dashboards.',
+    desc: 'A web-based e-processing system built for Barangay Batinguel, Dumaguete City, and proposed for adoption. Residents book the covered court, request documents and check announcements online; officials and the health-centre nurse manage it all from role-specific dashboards.',
     highlights: [
       'Three user roles, each with its own dashboard',
       'Supabase Auth + Row Level Security on every table',
@@ -211,6 +212,7 @@ export const projects: Project[] = [
   {
     id: 'fitpro',
     title: 'FitPro: The Lazy Fitness Assistant',
+    status: 'Personal project',
     subtitle: 'Fitness tracking with the effort removed',
     type: 'Mobile app',
     year: '2025 – 2026',
@@ -374,6 +376,10 @@ export const projectFilters = ['all', 'web', 'mobile', 'full-stack']
 const experienceEntries: ExperienceItem[] = [
   {
     id: 'remotasks',
+    // TODO(ezequel): one or two lines on what came of this work —
+    // volume handled, an accuracy/QA score, how long you stayed on a
+    // project. Hidden until filled in.
+    results: [],
     role: 'Data Annotator',
     company: 'Remotasks PH',
     location: 'Remote · Philippines',
@@ -388,6 +394,10 @@ const experienceEntries: ExperienceItem[] = [
   },
   {
     id: 'inspiro',
+    // TODO(ezequel): what you actually fixed or improved during the
+    // 200 hours — tickets closed, a process you sped up, a system you
+    // set up. Hidden until filled in.
+    results: [],
     role: 'Information Technology Intern',
     company: 'Inspiro/Infocom',
     location: 'Dumaguete City, Philippines',
@@ -403,6 +413,8 @@ const experienceEntries: ExperienceItem[] = [
   },
   {
     id: 'outlier',
+    // TODO(ezequel): a result from the AI training projects.
+    results: [],
     role: 'Data Annotator',
     company: 'Outlier AI',
     location: 'Remote · Philippines',
@@ -418,6 +430,8 @@ const experienceEntries: ExperienceItem[] = [
   },
   {
     id: 'ece',
+    // TODO(ezequel): a result from the 100-hour internship.
+    results: [],
     role: 'IT Support Intern',
     company: 'ECE Contact Centers',
     location: 'Dumaguete City, Philippines',
@@ -433,6 +447,8 @@ const experienceEntries: ExperienceItem[] = [
   },
   {
     id: 'qualfon',
+    // TODO(ezequel): a result from the Tier II account.
+    results: [],
     role: 'Customer Service Representative',
     company: 'Qualfon Dumaguete',
     location: 'Dumaguete City, Philippines',
@@ -470,7 +486,7 @@ const longestRunning = experienceEntries.reduce((longest, item) =>
 export const careerSnapshot = [
   { value: String(yearsSince(longestRunning.start)), label: 'yrs_remote_work' },
   { value: String(experienceEntries.length), label: 'roles_held' },
-  { value: String(projects.length), label: 'apps_shipped' },
+  { value: String(projects.length), label: 'apps_built' },
   { value: '2027', label: 'graduating' },
 ]
 

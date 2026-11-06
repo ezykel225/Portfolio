@@ -9,7 +9,7 @@
 // already hold.
 // ============================================================
 
-import { personal, experience, education, techStack, projects } from './data'
+import { personal, experience, education, techStack, projects, TODO } from './data'
 import { monthsBetween, formatDuration, formatRange, yearsSince } from './utils'
 
 /** Accent keys map to the existing brand tokens — no new colours. */
@@ -68,6 +68,8 @@ export type ExperienceRow = {
   technical: boolean
   desc: string
   bullets: string[]
+  /** Outcome lines; empty until written. */
+  results: string[]
   skills: string[]
   accent: Accent
 }
@@ -87,6 +89,7 @@ function toRow(item: (typeof experience)[number]): ExperienceRow {
     technical: TECHNICAL_IDS.has(item.id),
     desc: item.desc,
     bullets: item.bullets,
+    results: item.results ?? [],
     skills: item.skills,
     accent: accentForColor(item.color),
   }
@@ -120,10 +123,14 @@ const degree = education[0]
  * the space the board is trying to save.
  */
 export const aboutFacts: { label: string; value: string }[] = [
-  { label: 'now', value: personal.role + ' · ' + personal.seeking.replace(/^Seeking /, 'seeking ') },
+  // TODO(ezequel): one line on what you are working on or learning right
+  // now — e.g. "Finishing the barangay capstone; learning testing with
+  // Vitest". It replaced a line that just repeated the hero badge.
+  // Hidden until filled in.
+  { label: 'now', value: TODO },
   { label: 'studying', value: `${degree.degree} · ${degree.school}` },
   { label: 'based', value: personal.location },
-]
+].filter((fact) => fact.value !== TODO)
 
 /** Group counts for the stack card, so it reads as a summary not a wall. */
 export const stackGroups = techStack.map((group) => ({
@@ -145,10 +152,30 @@ function strip(url: string) {
   return url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')
 }
 
-/** Headline figures for the positioning card. All computed. */
+/** Reads a measured figure out of a project's own scope list. */
+function scopeValue(projectId: string, label: string): string | null {
+  const project = projects.find((item) => item.id === projectId)
+  return project?.caseStudy.scope.find((item) => item.label === label)?.value ?? null
+}
+
+/**
+ * Headline figures.
+ *
+ * Every one is either counted from the data or read from a project's
+ * measured scope — none is typed in by hand, and none is a usage,
+ * adoption or performance claim. Anything still TODO drops out rather
+ * than showing a placeholder, so the row is always true.
+ *
+ * "yrs remote (non-dev)" is labelled that way on purpose: it counts
+ * remote data-annotation work and must never read as development
+ * experience.
+ */
 export const workspaceStats: { value: string; label: string }[] = [
-  { value: String(projects.length), label: 'apps shipped' },
-  { value: String(experience.length), label: 'roles held' },
-  { value: `${remoteYears}y`, label: 'remote work' },
-  { value: String(stackTotal), label: 'technologies' },
-]
+  { value: String(projects.length), label: 'apps built' },
+  { value: scopeValue('barangay-batinguel', 'user_roles') ?? TODO, label: 'barangay roles' },
+  // TODO(ezequel): how many modules the barangay system has, and what you
+  // count as a module. The repo gives 14 routes and 14 tables, but nothing
+  // defines "module", so this stays hidden until you decide.
+  { value: TODO, label: 'barangay modules' },
+  { value: `${remoteYears}y`, label: 'yrs remote (non-dev)' },
+].filter((stat) => stat.value !== TODO)

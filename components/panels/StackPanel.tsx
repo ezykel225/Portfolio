@@ -39,7 +39,7 @@ export function StackFull() {
     <div className="flex flex-col gap-6">
       <p className="text-[13px] leading-relaxed text-[var(--muted)]">
         {stackTotal} technologies across {stackGroups.length} groups. Everything listed here is used in one of the two
-        shipped projects or in this site itself — nothing on the list is aspirational.
+        two projects or in this site itself — nothing on the list is aspirational.
       </p>
 
       {stackGroups.map((group) => (

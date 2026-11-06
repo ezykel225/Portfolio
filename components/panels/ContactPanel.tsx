@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { personal } from '@/lib/data'
 import { contactRoutes } from '@/lib/workspace'
+import { TODO } from '@/lib/data'
 import { GitHubIcon, LinkedInIcon, MailIcon, PinIcon } from '@/components/icons'
 import { ArrowOutIcon, SendIcon } from '../icons'
 
@@ -106,6 +107,31 @@ export function ContactFull() {
         <PinIcon className="h-3.5 w-3.5 shrink-0" />
         {personal.location}
       </p>
+
+      {/* The practical details someone checks before writing. Any row
+          still TODO is left out rather than shown as a placeholder. */}
+      <section>
+        <h3 className="wk-meta mb-2.5 flex items-center gap-2">
+          <span aria-hidden="true" className="h-2.5 w-[3px] rounded-full bg-[var(--green)]" />
+          Availability
+        </h3>
+        <dl className="grid gap-px overflow-hidden rounded-[var(--wk-radius-sm)] border border-[var(--wk-line)] bg-[var(--wk-line)]">
+          {[
+            { label: 'Open to', value: personal.availability.openTo.join(' · ') },
+            { label: 'Available from', value: personal.availability.from },
+            { label: 'Timezone', value: personal.availability.timezone },
+          ]
+            .filter((row) => row.value !== TODO)
+            .map((row) => (
+              <div key={row.label} className="flex items-baseline gap-3 bg-[var(--wk-card)] px-3.5 py-2.5">
+                <dt className="w-28 shrink-0 font-mono text-[10.5px] tracking-wide text-[var(--muted2)] uppercase">
+                  {row.label}
+                </dt>
+                <dd className="text-[12.5px] text-[var(--text)]">{row.value}</dd>
+              </div>
+            ))}
+        </dl>
+      </section>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <h3 className="wk-meta flex items-center gap-2">

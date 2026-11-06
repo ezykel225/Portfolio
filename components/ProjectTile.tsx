@@ -41,6 +41,11 @@ export function ProjectTile({ project, onOpen }: ProjectTileProps) {
         <span className="wk-meta absolute top-2.5 left-2.5 rounded-full border border-[var(--wk-line)] bg-[var(--bg)]/85 px-2 py-1 text-[var(--muted)] backdrop-blur-sm">
           {project.type}
         </span>
+        {/* How far the project actually got. Stated on the card so nobody
+            has to open the case study to find out it is a demo. */}
+        <span className="wk-meta absolute top-2.5 right-2.5 rounded-full border border-[var(--wk-line)] bg-[var(--bg)]/85 px-2 py-1 text-[var(--muted2)] backdrop-blur-sm">
+          {project.status}
+        </span>
       </div>
 
       <div className="flex flex-col gap-2.5 p-4">

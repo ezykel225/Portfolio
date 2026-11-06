@@ -4,6 +4,7 @@ import { workspaceStats } from '@/lib/workspace'
 import { MailIcon, GitHubIcon } from '@/components/icons'
 import { DownloadIcon, ArrowOutIcon } from './icons'
 import { AvailabilityChip } from './Identity'
+import { cn } from '@/lib/utils'
 import { track } from '@/lib/track'
 
 /**
@@ -13,6 +14,14 @@ import { track } from '@/lib/track'
  * over to the three actions and the four figures. Every figure is
  * computed in lib/workspace.ts from lib/data.ts; none is typed by hand.
  */
+/** Written out in full so Tailwind sees each class in the source. */
+const STAT_COLUMNS: Record<number, string> = {
+  1: 'min-[400px]:grid-cols-1',
+  2: 'min-[400px]:grid-cols-2',
+  3: 'min-[400px]:grid-cols-3',
+  4: 'min-[400px]:grid-cols-4',
+}
+
 export function PositionCard() {
   return (
     <section className="wk-card wk-rise relative overflow-hidden px-4 py-5 sm:px-7 sm:py-6">
@@ -28,13 +37,13 @@ export function PositionCard() {
         <AvailabilityChip />
       </div>
 
-      <h1 className="mb-3">
-        <span className="mb-2 block font-mono text-[11.5px] tracking-wider text-[var(--muted2)]">
-          {personal.name} · {personal.role}
-        </span>
-        <span className="wk-display block text-[clamp(1.45rem,3.4vw,2.2rem)] leading-[1.08] font-extrabold text-balance">
-          I build things that have to actually work.
-        </span>
+      {/* The name and role are already in the rail and the header, so the
+          heading is the positioning line alone. A visually hidden prefix
+          keeps the page's one h1 self-describing for search and screen
+          readers without printing it twice. */}
+      <h1 className="wk-display mb-3 text-[clamp(1.45rem,3.4vw,2.2rem)] leading-[1.08] font-extrabold text-balance">
+        <span className="sr-only">{personal.name}, {personal.role}. </span>
+        I build things that actually work.
       </h1>
 
       <p className="max-w-2xl text-[13.5px] leading-relaxed text-[var(--muted)]">{personal.summary}</p>
@@ -77,9 +86,16 @@ export function PositionCard() {
         </a>
       </div>
 
-      {/* Four across as soon as the labels fit; two below that,
-          because a clipped figure is worse than an extra row. */}
-      <dl className="mt-5 grid grid-cols-2 gap-px overflow-hidden min-[400px]:grid-cols-4 rounded-[var(--wk-radius-sm)] border border-[var(--wk-line)] bg-[var(--wk-line)]">
+      {/* As many columns as there are figures — a stat still waiting on a
+          number drops out of the list, and the row must not leave a hole
+          where it was. Two across on the narrowest screens, because a
+          clipped figure is worse than an extra row. */}
+      <dl
+        className={cn(
+          'mt-5 grid grid-cols-2 gap-px overflow-hidden rounded-[var(--wk-radius-sm)] border border-[var(--wk-line)] bg-[var(--wk-line)]',
+          STAT_COLUMNS[workspaceStats.length] ?? 'min-[400px]:grid-cols-4'
+        )}
+      >
         {workspaceStats.map((stat) => (
           <div key={stat.label} className="bg-[var(--wk-card)] px-2.5 py-2.5 sm:px-3">
             <dt className="sr-only">{stat.label}</dt>
