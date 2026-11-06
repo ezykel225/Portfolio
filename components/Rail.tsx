@@ -4,6 +4,7 @@ import { GitHubIcon, LinkedInIcon, MailIcon, PinIcon } from '@/components/icons'
 import { DownloadIcon } from './icons'
 import { navItems, type NavTarget } from './NavItems'
 import { Monogram, AvailabilityDot } from './Identity'
+import { track } from '@/lib/track'
 import { cn } from '@/lib/utils'
 
 interface RailProps {
@@ -15,10 +16,10 @@ interface RailProps {
 }
 
 const socials = [
-  { href: personal.github, label: 'GitHub profile', Icon: GitHubIcon },
-  { href: personal.linkedin, label: 'LinkedIn profile', Icon: LinkedInIcon },
-  { href: `mailto:${personal.email}`, label: `Email ${personal.name}`, Icon: MailIcon },
-]
+  { href: personal.github, label: 'GitHub profile', Icon: GitHubIcon, method: 'github' },
+  { href: personal.linkedin, label: 'LinkedIn profile', Icon: LinkedInIcon, method: 'linkedin' },
+  { href: `mailto:${personal.email}`, label: `Email ${personal.name}`, Icon: MailIcon, method: 'email' },
+] as const
 
 /**
  * The persistent left rail — identity at the top, navigation in the
@@ -110,11 +111,12 @@ export function Rail({ active, onSelect, onOpenProject, openProjectId }: RailPro
       {/* Reach me */}
       <div className="wk-card wk-rise wk-d2 p-2">
         <div className="flex items-center gap-1.5">
-          {socials.map(({ href, label, Icon }) => (
+          {socials.map(({ href, label, Icon, method }) => (
             <a
               key={label}
               href={href}
               aria-label={label}
+              onClick={() => track({ name: 'contact_clicked', method })}
               {...(href.startsWith('http') ? { target: '_blank', rel: 'noreferrer noopener' } : {})}
               className="wk-interactive flex h-10 flex-1 items-center justify-center rounded-[var(--wk-radius-sm)] border border-[var(--wk-line)] text-[var(--muted)] hover:text-[var(--purple-l)]"
             >
@@ -125,6 +127,7 @@ export function Rail({ active, onSelect, onOpenProject, openProjectId }: RailPro
           <a
             href={personal.resumeUrl}
             download
+            onClick={() => track({ name: 'resume_downloaded', from: 'rail' })}
             aria-label="Download résumé (PDF)"
             className="wk-interactive flex h-10 flex-1 items-center justify-center rounded-[var(--wk-radius-sm)] border border-[var(--wk-line)] text-[var(--muted)] hover:text-[var(--purple-l)]"
           >

@@ -2,6 +2,7 @@
 import { useCallback, useRef, useState } from 'react'
 import { projects } from '@/lib/data'
 import { panelMeta, accentVar, type PanelId } from '@/lib/workspace'
+import { track } from '@/lib/track'
 import { Rail } from './Rail'
 import { TopBar, PhoneBar } from './TopBar'
 import { PositionCard } from './PositionCard'
@@ -64,11 +65,13 @@ export function Workspace() {
 
     setProjectId(null)
     setPanel(target)
+    track({ name: 'panel_opened', panel: target })
   }, [])
 
   const openProject = useCallback((id: string) => {
     setPanel(null)
     setProjectId(id)
+    track({ name: 'project_opened', project: id })
   }, [])
 
   const closePanel = useCallback(() => setPanel(null), [])
@@ -129,7 +132,10 @@ export function Workspace() {
                   key={id}
                   label={meta.title}
                   accent={accentVar[meta.accent]}
-                  onOpen={() => setPanel(id)}
+                  onOpen={() => {
+                    setPanel(id)
+                    track({ name: 'panel_opened', panel: id })
+                  }}
                   openLabel={`Open ${meta.title} — ${meta.caption}`}
                 >
                   <Glance />

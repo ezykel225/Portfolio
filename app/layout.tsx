@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Syne, DM_Sans, Fira_Code } from 'next/font/google'
-import { personal } from '@/lib/data'
+import { Analytics } from '@vercel/analytics/next'
+import { personal, projects, education } from '@/lib/data'
+import { siteUrl } from '@/lib/site'
 import './globals.css'
 import './workspace.css'
 
@@ -15,17 +17,6 @@ const description =
   `${personal.role} in ${personal.locationShort}, seeking a first developer role. ` +
   'I build full-stack web apps with React, TypeScript and Supabase, and mobile apps ' +
   'with Expo and React Native. 4th year BSIT student, graduating 2027.'
-
-/**
- * Absolute base for the OG/Twitter image URLs. Vercel injects the real
- * production domain at build time; NEXT_PUBLIC_SITE_URL overrides it if
- * the site moves to a custom domain.
- */
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : 'http://localhost:3000')
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -48,18 +39,56 @@ export const metadata: Metadata = {
     title,
     description,
     siteName: `${personal.name} — Portfolio`,
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: title }],
     type: 'website',
     locale: 'en_PH',
   },
-  twitter: { card: 'summary_large_image', title, description, images: ['/og-image.png'] },
+  twitter: { card: 'summary_large_image', title, description },
+}
+
+/**
+ * Structured data, so a search for my name can show who I am rather than
+ * just a page title. Every field comes from lib/data.ts — nothing here is
+ * a second copy of a fact.
+ */
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: personal.name,
+  jobTitle: personal.role,
+  email: `mailto:${personal.email}`,
+  url: siteUrl,
+  description: personal.summary,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Dumaguete',
+    addressRegion: 'Central Visayas',
+    addressCountry: 'PH',
+  },
+  alumniOf: { '@type': 'CollegeOrUniversity', name: education[0].school },
+  sameAs: [personal.github, personal.linkedin],
+  knowsAbout: ['React', 'TypeScript', 'Next.js', 'Supabase', 'React Native', 'Expo'],
+  subjectOf: projects.map((project) => ({
+    '@type': 'CreativeWork',
+    name: project.title,
+    description: project.subtitle,
+    url: project.live,
+  })),
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${syne.variable} ${dmSans.variable} ${firaCode.variable}`}>
       {/* Every style in workspace.css is scoped under .wk. */}
-      <body className="wk antialiased">{children}</body>
+      <body className="wk antialiased">
+        {children}
+        <script
+          type="application/ld+json"
+          // Serialised, not interpolated text: the values come from our own
+          // data file and JSON.stringify escapes them correctly.
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
+        />
+        <Analytics />
+      </body>
     </html>
   )
 }

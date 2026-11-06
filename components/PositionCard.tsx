@@ -1,8 +1,10 @@
+'use client'
 import { personal } from '@/lib/data'
 import { workspaceStats } from '@/lib/workspace'
 import { MailIcon, GitHubIcon } from '@/components/icons'
 import { DownloadIcon, ArrowOutIcon } from './icons'
 import { AvailabilityChip } from './Identity'
+import { track } from '@/lib/track'
 
 /**
  * The positioning card — the first thing read on the board.
@@ -42,6 +44,7 @@ export function PositionCard() {
       <div className="mt-5 grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:items-center">
         <a
           href={`mailto:${personal.email}`}
+          onClick={() => track({ name: 'contact_clicked', method: 'email' })}
           className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--wk-radius-sm)] bg-[var(--purple)] px-3 text-[13px] font-semibold text-white transition-colors hover:bg-[#6D28D9] sm:px-4"
         >
           <MailIcon className="h-4 w-4 shrink-0" />
@@ -54,6 +57,7 @@ export function PositionCard() {
         <a
           href={personal.resumeUrl}
           download
+          onClick={() => track({ name: 'resume_downloaded', from: 'position_card' })}
           className="wk-interactive inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--wk-radius-sm)] border border-[var(--wk-line)] px-3 text-[13px] font-medium text-[var(--muted)] hover:text-[var(--text)] sm:px-4"
         >
           <DownloadIcon className="h-4 w-4 shrink-0" />
@@ -64,6 +68,7 @@ export function PositionCard() {
           href={personal.github}
           target="_blank"
           rel="noreferrer noopener"
+          onClick={() => track({ name: 'contact_clicked', method: 'github' })}
           className="wk-interactive inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--wk-radius-sm)] border border-[var(--wk-line)] px-3 text-[13px] font-medium text-[var(--muted)] hover:text-[var(--text)] sm:px-4"
         >
           <GitHubIcon className="h-4 w-4 shrink-0" />
