@@ -4,7 +4,6 @@ import { workspaceStats } from '@/lib/workspace'
 import { MailIcon, GitHubIcon } from '@/components/icons'
 import { DownloadIcon, ArrowOutIcon } from './icons'
 import { AvailabilityChip } from './Identity'
-import { LiveCounter } from './LiveCounter'
 import { track } from '@/lib/track'
 
 /**
@@ -27,7 +26,6 @@ export function PositionCard() {
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <p className="wk-meta rounded-full border border-[var(--wk-line)] px-2.5 py-1">{personal.studentLine}</p>
         <AvailabilityChip />
-        <LiveCounter />
       </div>
 
       <h1 className="mb-3">

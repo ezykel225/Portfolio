@@ -4,6 +4,7 @@ import { GitHubIcon, MailIcon } from '@/components/icons'
 import { DownloadIcon } from './icons'
 import { navItems, type NavTarget } from './NavItems'
 import { Monogram, AvailabilityDot } from './Identity'
+import { LiveCounter } from './LiveCounter'
 import { cn } from '@/lib/utils'
 
 interface BarProps {
@@ -34,6 +35,8 @@ export function TopBar() {
             </>
           ) : null}
         </p>
+        {/* Below 1024px there is no rail, so the counter lives here. */}
+        <LiveCounter className="mt-0.5 text-[10.5px]" />
       </div>
 
       <div className="flex items-center gap-1.5">

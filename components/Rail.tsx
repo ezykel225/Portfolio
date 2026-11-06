@@ -4,6 +4,7 @@ import { GitHubIcon, LinkedInIcon, MailIcon, PinIcon } from '@/components/icons'
 import { DownloadIcon } from './icons'
 import { navItems, type NavTarget } from './NavItems'
 import { Monogram, AvailabilityDot } from './Identity'
+import { LiveCounter } from './LiveCounter'
 import { track } from '@/lib/track'
 import { cn } from '@/lib/utils'
 
@@ -51,6 +52,10 @@ export function Rail({ active, onSelect, onOpenProject, openProjectId }: RailPro
             <span className="truncate">{personal.seeking}</span>
           </p>
         ) : null}
+
+        {/* Live numbers, ruled off from the identity above them: everything
+            else in this card is fixed, this is the only part that moves. */}
+        <LiveCounter className="mt-3 border-t border-[var(--wk-line)] pt-3" />
       </div>
 
       {/* Navigation */}

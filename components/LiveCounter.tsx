@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { cn } from '@/lib/utils'
 
 /** How often a visible tab says "still here". */
 const PING_MS = 12_000
@@ -21,81 +22,100 @@ function sessionId(): string {
   }
 }
 
+// ------------------------------------------------------------
+// One poller for the whole page.
+//
+// The counter is rendered twice — once in the rail, once in the compact
+// header — and only one of those is ever on screen. They must not each
+// run their own loop: that would double the request volume and, because
+// each would claim to be the tab's first ping, count every visit twice.
+// So the polling lives here, at module scope, and the components are
+// just subscribers.
+// ------------------------------------------------------------
+
+let live: Live | null = null
+let counted = false
+let timer: ReturnType<typeof setTimeout> | undefined
+const listeners = new Set<(value: Live | null) => void>()
+
+async function ping() {
+  if (typeof document === 'undefined' || document.visibilityState !== 'visible') return
+  try {
+    const response = await fetch('/api/presence', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: sessionId(), first: !counted }),
+    })
+    if (!response.ok) return
+    const data = await response.json()
+    if (!data?.available) return
+    counted = true
+    live = { viewing: data.viewing, views: data.views }
+    listeners.forEach((listener) => listener(live))
+  } catch {
+    // Offline or blocked: keep whatever was last shown.
+  }
+}
+
+function loop() {
+  void ping()
+  timer = setTimeout(loop, PING_MS)
+}
+
+/** Catch up as soon as the visitor returns to the tab. */
+function onVisible() {
+  if (document.visibilityState === 'visible') void ping()
+}
+
+function subscribe(listener: (value: Live | null) => void) {
+  listeners.add(listener)
+  if (listeners.size === 1) {
+    document.addEventListener('visibilitychange', onVisible)
+    loop()
+  }
+  return () => {
+    listeners.delete(listener)
+    if (listeners.size === 0) {
+      if (timer) clearTimeout(timer)
+      timer = undefined
+      document.removeEventListener('visibilitychange', onVisible)
+    }
+  }
+}
+
 /**
  * "N viewing now · M views".
  *
- * Renders nothing at all until the first successful reply, and nothing
- * ever if the backend is not configured or is unreachable — the counter
- * is a nicety, and a broken one is worse than none. There is no loading
- * state and no error state for the same reason: the row simply appears
- * when there is something true to say.
- *
- * Pinging stops while the tab is hidden, so a forgotten background tab
- * neither inflates the count nor burns through the request budget.
+ * Renders nothing until the first successful reply, and nothing at all if
+ * the backend is not configured or is unreachable — the counter is a
+ * nicety, and a broken one is worse than none. There is no loading state
+ * and no error state for the same reason: the line simply appears when
+ * there is something true to say.
  */
-export function LiveCounter() {
-  const [live, setLive] = useState<Live | null>(null)
+export function LiveCounter({ className }: { className?: string }) {
+  const [value, setValue] = useState<Live | null>(live)
 
-  useEffect(() => {
-    const id = sessionId()
-    let cancelled = false
-    let timer: ReturnType<typeof setTimeout> | undefined
-    let first = true
+  useEffect(() => subscribe(setValue), [])
 
-    const ping = async () => {
-      if (document.visibilityState !== 'visible') return
-      try {
-        const response = await fetch('/api/presence', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id, first }),
-        })
-        if (!response.ok) return
-        const data = await response.json()
-        if (!cancelled && data?.available) {
-          first = false
-          setLive({ viewing: data.viewing, views: data.views })
-        }
-      } catch {
-        // Offline or blocked: keep whatever was last shown.
-      }
-    }
-
-    const loop = () => {
-      void ping()
-      timer = setTimeout(loop, PING_MS)
-    }
-    loop()
-
-    // Catch up immediately when the visitor comes back to the tab.
-    const onVisible = () => {
-      if (document.visibilityState === 'visible') void ping()
-    }
-    document.addEventListener('visibilitychange', onVisible)
-
-    return () => {
-      cancelled = true
-      if (timer) clearTimeout(timer)
-      document.removeEventListener('visibilitychange', onVisible)
-    }
-  }, [])
-
-  if (!live) return null
+  if (!value) return null
 
   return (
     <p
-      className="flex items-center gap-2 rounded-full border border-[var(--wk-line)] px-2.5 py-1 font-mono text-[10.5px] tracking-wide text-[var(--muted2)]"
-      // One announcement when the numbers settle, not on every poll.
+      // Styled as one of the identity card's meta lines rather than as a
+      // badge, so it reads as part of who is here rather than as chrome.
+      className={cn('flex items-center gap-2 text-[11.5px] text-[var(--muted2)]', className)}
+      // Not announced on every poll — the numbers change on their own and
+      // interrupting a screen reader every twelve seconds would be hostile.
       aria-live="off"
     >
       <span className="relative flex h-1.5 w-1.5 shrink-0" aria-hidden="true">
         <span className="animate-pulse-dot absolute inline-flex h-full w-full rounded-full bg-[var(--green)]" />
       </span>
-      <span className="text-[var(--muted)]">
-        {live.viewing} viewing now
+      <span className="truncate">
+        <span className="text-[var(--muted)]">{value.viewing} viewing now</span>
+        {' · '}
+        {value.views.toLocaleString()} views
       </span>
-      <span aria-hidden="true" className="text-[var(--wk-line)]">·</span>
-      <span>{live.views.toLocaleString()} views</span>
     </p>
   )
 }
